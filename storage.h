@@ -32,6 +32,8 @@ typedef struct _Storage {
     pthread_mutex_t mutex;
     int count;
     int max_count;
+
+    pthread_spinlock_t lock;
 } storage_t;
 
 void *monitor(void *arg);

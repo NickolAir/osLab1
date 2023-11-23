@@ -7,10 +7,10 @@ void *monitor(void *arg) {
 
     printf("monitor: [%d %d %d]\n", getpid(), getppid(), gettid());
 
-    while (1) {
+    /*while (1) {
         storage_print_stats(s);
         sleep(1);
-    }
+    }*/
 
     return NULL;
 }
@@ -31,6 +31,12 @@ storage_t* storage_init(int max_count) {
     s->add_attempts = s->get_attempts = 0;
     s->add_count = s->get_count = 0;
 
+    err = pthread_spin_init(&s->lock, PTHREAD_PROCESS_SHARED);
+    if (err) {
+        printf("queue_init: pthread_spin_init() failed: %s\n", strerror(err));
+        abort();
+    }
+
     err = pthread_create(&s->monitor_tid, NULL, monitor, s);
     if (err) {
         printf("queue_init: pthread_create() failed: %s\n", strerror(err));
@@ -40,11 +46,13 @@ storage_t* storage_init(int max_count) {
 }
 
 void storage_destroy(storage_t *q) {
-    int val = -1;
+    pthread_spin_destroy(&q->lock);
+    char **val;
+    strcpy(*val, "-1");
     while(q->first != q->last) {
-        storage_get(q, &val);
+        storage_get(q, val);
     }
-    storage_get(q, &val);
+    storage_get(q, val);
 }
 
 int storage_add(storage_t *q, char* val) {
