@@ -31,17 +31,17 @@ storage_t* storage_init(int max_count) {
     s->add_attempts = s->get_attempts = 0;
     s->add_count = s->get_count = 0;
 
-    err = pthread_spin_init(&s->lock, PTHREAD_PROCESS_SHARED);
+    /*err = pthread_spin_init(&s->lock, PTHREAD_PROCESS_SHARED);
     if (err) {
         printf("queue_init: pthread_spin_init() failed: %s\n", strerror(err));
         abort();
-    }
+    }*/
 
-    err = pthread_create(&s->monitor_tid, NULL, monitor, s);
-    if (err) {
-        printf("queue_init: pthread_create() failed: %s\n", strerror(err));
+    if (pthread_mutex_init(&s->mutex, NULL) != 0) {
+        printf("Failed to initialize mutex\n");
         abort();
     }
+
     return s;
 }
 

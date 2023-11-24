@@ -3,4 +3,4 @@ project(osLab1 C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(osLab1 2-3.c storage.c)
+add_executable(osLab1 2-3mutex.c storage.c)
